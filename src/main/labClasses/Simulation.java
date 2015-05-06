@@ -79,16 +79,16 @@ public class Simulation {
 		Collections.shuffle(actors, RandomGenerator.getRandom());
 		ArrayList<Plant> deadPlants = new ArrayList<Plant>();
 		ArrayList<Actor> newActors = new ArrayList<Actor>();
+		
+		//run act for each actor and then check if the actor should still take part.
 		for(Actor actor : actors) {
 			actor.act(field, newActors);
 			if(actor instanceof Plant && !((Plant)actor).isAlive()) {
 				deadPlants.add((Plant) actor);
 			}
 		}
-		//add any new actors to the actors array.
-		for (Actor newActor : newActors) {
-			actors.add(newActor);
-		}
+		
+		addNewActors(newActors);
 		removePlantsIfDead(deadPlants);
 		step++;
 		view.showStatus(step, field);
@@ -98,6 +98,12 @@ public class Simulation {
 		for (Plant plant : deadPlants) {
 			actors.remove(plant);
 			field.clearLocation(plant.getLocation());
+		}
+	}
+	
+	private void addNewActors(ArrayList<Actor> newActors) {
+		for(Actor actor : newActors) {
+			actors.add(actor);
 		}
 	}
 	
