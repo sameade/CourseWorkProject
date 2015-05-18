@@ -7,6 +7,7 @@ import java.util.Collections;
 import actors.Actor;
 import actors.BeanPlant;
 import actors.Farmer;
+import actors.Plant;
 import actors.Weed;
 import baseCode.Field;
 import baseCode.Location;
@@ -49,12 +50,10 @@ public class Simulation {
 					Farmer farmer = new Farmer();
 					placeActor(farmer, x, y);
 				} else if (random < ModelConstants.WEED_CREATION_PROB) {
-					int age = RandomGenerator.getRandom().nextInt(150);
-					Weed weed = new Weed(age);
+					Weed weed = new Weed(true);
 					placeActor(weed, x, y);
 				} else if (random < ModelConstants.BEAN_CREATION_PROB) {
-					int age = RandomGenerator.getRandom().nextInt(150);
-					BeanPlant beanPlant = new BeanPlant(age);
+					BeanPlant beanPlant = new BeanPlant(true);
 					placeActor(beanPlant, x, y);
 				}	
 			}
@@ -69,24 +68,48 @@ public class Simulation {
 		field.place(actor, location);
 	}
 	
-	private void simulate(int numberOfSteps) {
+	private void simulate(int numberOfSteps) throws InterruptedException {
 		for (int i = 0; i < numberOfSteps; i++) {
 			simulateOneStep();
+			Thread.sleep(100);
 		}
 	}
 	
 	private void simulateOneStep() {
 		Collections.shuffle(actors, RandomGenerator.getRandom());
+		ArrayList<Plant> deadPlants = new ArrayList<Plant>();
+		ArrayList<Actor> newActors = new ArrayList<Actor>();
+		
+		//run act for each actor and then check if the actor should still take part.
 		for(Actor actor : actors) {
-			actor.act(field);
+			actor.act(field, newActors);
+			if(actor instanceof Plant && !((Plant)actor).isAlive()) {
+				deadPlants.add((Plant) actor);
+			}
 		}
+		
+		addNewActors(newActors);
+		removePlantsIfDead(deadPlants);
 		step++;
 		view.showStatus(step, field);
 	}
 	
-	public static void main(String[] args) {
+	private void removePlantsIfDead(ArrayList<Plant> deadPlants) {
+		for (Plant plant : deadPlants) {
+			actors.remove(plant);
+			field.clearLocation(plant.getLocation());
+		}
+	}
+	
+	private void addNewActors(ArrayList<Actor> newActors) {
+		for(Actor actor : newActors) {
+			actors.add(actor);
+		}
+	}
+	
+	public static void main(String[] args) throws InterruptedException {
 		Simulation sim = new Simulation(50, 50);
 		sim.populate();
-		sim.simulate(10000);
+		sim.simulate(1000);
 	}
 }

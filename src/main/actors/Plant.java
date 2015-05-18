@@ -2,16 +2,18 @@ package actors;
 
 public abstract class Plant extends Actor{
 
-	private int Age;
+	private int age;
 	
 	private boolean alive;
 	
+	protected abstract void incrementAge();
+	
 	public int getAge() {
-		return Age;
+		return age;
 	}
 
 	public void setAge(int age) {
-		Age = age;
+		this.age = age;
 	}
 
 	public boolean isAlive() {

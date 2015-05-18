@@ -1,13 +1,15 @@
 package actors;
 
+import java.util.ArrayList;
+
 import baseCode.Field;
 import baseCode.Location;
 
 public abstract class Actor {
 	
-	private Location location;
+	public abstract void act(Field field, ArrayList<Actor> actors);
 	
-	public abstract void act(Field field);
+	private Location location;
 
 	public Location getLocation() {
 		return location;
